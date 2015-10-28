@@ -11,7 +11,7 @@ class UsersController extends AppController {
     public function beforeFilter() {
         
         $this->Auth->allow('auth_vk');
-        
+        parent::beforeFilter();
     }
     /**
      * Redirected at vk.com authorization, which redirected at original page
@@ -25,7 +25,7 @@ class UsersController extends AppController {
             $this->redirect($this->request->referer('/', true));
             
         }
-        if(!$this->Session->check('User.authReferLink')) {
+        if (!$this->Session->check('User.authReferLink')) {
             
             $this->Session->write(
                 'User.authReferLink', 
@@ -71,13 +71,13 @@ class UsersController extends AppController {
             if (isset($userInfo['response'][0]['uid'])) {
                 
                 $userInfo = $userInfo['response'][0];                
-                if(isset($token['email'])) {
+                if (isset($token['email'])) {
                     
                     $userInfo['email'] = $token['email'];
                 
                 }
                 
-                if($this->Session->check('User.authReferLink')) {                    
+                if ($this->Session->check('User.authReferLink')) {                    
                     $referLink = $this->Session->read('User.authReferLink');  
                     $this->Session->delete('User.authReferLink');                    
                 } else {
@@ -103,27 +103,26 @@ class UsersController extends AppController {
      *
      * @access private
      *
-     * @todo adding gender, birthday, updating  existing users fieldsby by new values  
+     * @todo adding gender, birthday, updating  existing users fields by new values  
      */     
     private function addUser($userInfo, $socialNetwork, $referLink, $role = 'user') {
         
         $socialNetworkField = $socialNetwork . '_key';
-        $savedUser = $this->User->find(
-            'first', 
-            array(
-                'conditions' => array(
-                    'User.' . $socialNetworkField => $userInfo['uid']
-                )
-            )
-        );                
-        if(!empty($savedUser)) {
+        $options = array(
+            'conditions' => array(
+                'User.' . $socialNetworkField => $userInfo['uid']
+            ),
+            'recursive' => -1
+        );
+        $savedUser = $this->User->find('first',  $options);                
+        if (!empty($savedUser)) {
             
-            if($this->Auth->login(array('id' => $savedUser['User']['id']))) {
+            if ($this->Auth->login($savedUser['User'])) {
                 
                 $this->redirect($referLink);
                 
             }
-        }        
+        }
         $userAr = Array(
             'User' => Array(
                 $socialNetworkField => $userInfo['uid'],
@@ -134,13 +133,18 @@ class UsersController extends AppController {
             )
         );        
         $this->User->create();
-        if($this->User->save($userAr)) {
+        if ($this->User->save($userAr)) {
             
-            if($this->Auth->login(array($socialNetworkField => $userAr['User'][$socialNetworkField]))) {
+            $savedUser = $this->User->find('first',  $options);
+            if ($this->Auth->login($savedUser['User'])) {
                 
                 $this->redirect($referLink);
                 
             }
         }
     }
+    
+    public function logout() {
+		return $this->redirect($this->Auth->logout());
+	}
 }
