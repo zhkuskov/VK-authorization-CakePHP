@@ -10,11 +10,11 @@ class UsersController extends AppController {
     
     public function beforeFilter() {
         
-        $this->Auth->allow('auth_vk');
+        $this->Auth->allow('auth_vk', 'logout');
         parent::beforeFilter();
     }
     /**
-     * Redirected at vk.com authorization, which redirected at original page
+     * Redirected to vk.com authorization, which redirected back to original page
      *
      * Configuration set in config/bootstrap.php
      */    
@@ -144,7 +144,11 @@ class UsersController extends AppController {
         }
     }
     
+    /**
+     * logout user 
+     */     
     public function logout() {
+        
 		return $this->redirect($this->Auth->logout());
 	}
 }
