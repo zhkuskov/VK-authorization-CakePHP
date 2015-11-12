@@ -55,6 +55,10 @@ class UsersController extends AppController {
         $tokenLink = Configure::read('vkAuth.urlGetToken') 
             . '?' . urldecode(http_build_query($params));
         $token = file_get_contents($tokenLink);
+        if ($token === false) {
+            $this->set('errorMessage', 'ВК не отвечает');
+            return false;
+        }
         $token = json_decode($token, true);
  
         if (isset($token['access_token'])) {
@@ -67,6 +71,10 @@ class UsersController extends AppController {
             $userInfoLink = Configure::read('vkAuth.urlGetUserInfo') 
                 . '?' . urldecode(http_build_query($params));
             $userInfo = file_get_contents($userInfoLink);
+            if ($userInfo === false) {
+                $this->set('errorMessage', 'ВК не отвечает');
+                return false;
+            }
             $userInfo = json_decode($userInfo, true);
             if (isset($userInfo['response'][0]['uid'])) {
                 
@@ -75,6 +83,8 @@ class UsersController extends AppController {
                     
                     $userInfo['email'] = $token['email'];
                 
+                } else {
+                    $userInfo['email'] = '';   
                 }
                 
                 if ($this->Session->check('User.authReferLink')) {                    
@@ -103,7 +113,8 @@ class UsersController extends AppController {
      *
      * @access private
      *
-     * @todo adding gender, birthday, updating  existing users fields by new values  
+     * @todo adding gender and birthday
+     * @todo updating  existing users fields by new values  
      */     
     private function addUser($userInfo, $socialNetwork, $referLink, $role = 'user') {
         
