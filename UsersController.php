@@ -54,49 +54,77 @@ class UsersController extends AppController {
         );
         $tokenLink = Configure::read('vkAuth.urlGetToken') 
             . '?' . urldecode(http_build_query($params));
-        $token = file_get_contents($tokenLink);
-        if ($token === false) {
+        
+        try {
+            $token = file_get_contents($tokenLink);
+        } catch (Exception $e) {
             $this->set('errorMessage', 'ВК не отвечает');
+            
             return false;
         }
+        
+        if ($token === false) {
+            $this->set('errorMessage', 'ВК не отвечает');
+            
+            return false;
+        }
+        
         $token = json_decode($token, true);
  
-        if (isset($token['access_token'])) {
+        if (!isset($token['access_token'])) {
+            $this->set('errorMessage', 'ВК вас не авторизовал');
             
-            $params = array(
-                'uids'         => $token['user_id'],
-                'fields'       => 'uid,first_name,last_name,sex,bdate',
-                'access_token' => $token['access_token']
-            );
-            $userInfoLink = Configure::read('vkAuth.urlGetUserInfo') 
-                . '?' . urldecode(http_build_query($params));
-            $userInfo = file_get_contents($userInfoLink);
-            if ($userInfo === false) {
-                $this->set('errorMessage', 'ВК не отвечает');
-                return false;
-            }
-            $userInfo = json_decode($userInfo, true);
-            if (isset($userInfo['response'][0]['uid'])) {
-                
-                $userInfo = $userInfo['response'][0];                
-                if (isset($token['email'])) {
-                    
-                    $userInfo['email'] = $token['email'];
-                
-                } else {
-                    $userInfo['email'] = '';   
-                }
-                
-                if ($this->Session->check('User.authReferLink')) {                    
-                    $referLink = $this->Session->read('User.authReferLink');  
-                    $this->Session->delete('User.authReferLink');                    
-                } else {
-                    $referLink = '/';
-                }
-                
-                $this->addUser($userInfo, 'vk', $referLink);               
-            }
+            return false;
         }
+        
+        $params = array(
+            'uids'         => $token['user_id'],
+            'fields'       => 'uid,first_name,last_name,sex,bdate',
+            'access_token' => $token['access_token']
+        );
+        $userInfoLink = Configure::read('vkAuth.urlGetUserInfo') 
+            . '?' . urldecode(http_build_query($params));
+            
+        try {    
+            $userInfo = file_get_contents($userInfoLink);
+        } catch (Exception $e) {
+            $this->set('errorMessage', 'ВК не отвечает');
+            
+            return false;
+        }
+        
+        if ($userInfo === false) {
+            $this->set('errorMessage', 'ВК не отвечает');
+            
+            return false;
+        }
+        
+        $userInfo = json_decode($userInfo, true);
+        
+        if (!isset($userInfo['response'][0]['uid'])) {
+            $this->set('errorMessage', 'ВК вас не авторизовал');
+            
+            return false;
+        }
+        
+        $userInfo = $userInfo['response'][0]; 
+        
+        if (isset($token['email'])) {
+            
+            $userInfo['email'] = $token['email'];
+        
+        } else {
+            $userInfo['email'] = '';   
+        }
+        
+        if ($this->Session->check('User.authReferLink')) {                    
+            $referLink = $this->Session->read('User.authReferLink');  
+            $this->Session->delete('User.authReferLink');                    
+        } else {
+            $referLink = '/';
+        }
+        
+        $this->addUser($userInfo, 'vk', $referLink);               
 	}
     /**
      * Add new users and authorize their by id in social network 
