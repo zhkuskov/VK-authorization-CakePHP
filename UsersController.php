@@ -58,7 +58,8 @@ class UsersController extends AppController {
             . '?' . urldecode(http_build_query($params));
         
         try {
-            $token = file_get_contents($tokenLink);
+            //because app should not show app secret
+            $token = @file_get_contents($tokenLink);
         } catch (Exception $e) {
             $this->set('errorMessage', 'ВК не отвечает');
             
@@ -89,8 +90,9 @@ class UsersController extends AppController {
         $userInfoLink = Configure::read('vkAuth.urlGetUserInfo') 
             . '?' . urldecode(http_build_query($params));
             
-        try {    
-            $userInfo = file_get_contents($userInfoLink);
+        try {
+            //because app should not show app secret
+            $userInfo = @file_get_contents($userInfoLink);
         } catch (Exception $e) {
             $this->set('errorMessage', 'ВК не отвечает');
             
