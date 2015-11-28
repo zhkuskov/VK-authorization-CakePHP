@@ -49,10 +49,10 @@ AUTO_INCREMENT=3
 ;
 ```
 
-Add link /users/auth_vk/ in your app.
+Add link '/users/auth_vk/' in your app.
 
 
-Create view auth_vk.ctp from error message (if redirect failed) like that:
+Create view 'auth_vk.ctp', which used if redirect is failed. Outpud error message like that:
 
 ```html
 <div class="container">
