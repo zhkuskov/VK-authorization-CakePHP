@@ -50,3 +50,24 @@ AUTO_INCREMENT=3
 ```
 
 Add link /users/auth_vk/ in your app.
+
+
+Create view auth_vk.ctp from error message (if redirect failed) like that:
+
+```html
+<div class="container">
+    <h2>Something went wrong!</h2>
+    <?php if (isset($errorMessage)) { ?>
+        <p><?php echo $errorMessage ?></p>
+    <?php } ?>
+
+    <?php echo $this->Html->link(
+        'Try again', 
+        array(
+            'controller' => 'users',
+            'action' => 'auth_vk',
+            'admin' => false
+        )
+    );?>
+</div>
+```
