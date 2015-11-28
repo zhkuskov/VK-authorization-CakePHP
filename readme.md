@@ -3,13 +3,14 @@
 ### Features ###
 
 It is very simple controller from users. 
-If you need to support other social network, you can use method 'addUser' and call it in own specific method wnen OAuth return user data
+
+If you need to support other social network, you can use method 'addUser'. Call it in your specific method when OAuth return user data.
 
 ### How do I get set up? ###
 
-Copy controller
+Copy controller.
 
-[Create](https://vk.com/editapp?act=create) your app in vk.com 
+[Create](https://vk.com/editapp?act=create) your app in vk.com.
 
 Add in your configures file (app/Config/bootstrap.php): 
 
@@ -48,4 +49,4 @@ AUTO_INCREMENT=3
 ;
 ```
 
-add link /users/auth_vk/ in your app
+Add link /users/auth_vk/ in your app.
