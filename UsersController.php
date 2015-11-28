@@ -14,6 +14,7 @@ class UsersController extends AppController {
         
         $this->Auth->allow('auth_vk', 'logout');
         parent::beforeFilter();
+        
     }
     /**
      * Redirected to vk.com authorization, which redirected back to original page
@@ -168,7 +169,7 @@ class UsersController extends AppController {
     /**
      * Add new users and authorize their by id in social network
      *
-     * If id of social network is exist authorize user and update fields    
+     * If id of social network is exist the method authorize user and update fields    
      *
      * array['uid'] int User id in social network
      * array['first_name'] string User first name
@@ -181,14 +182,10 @@ class UsersController extends AppController {
      * @param array $userInfo Array user data (see above)
      * @param string $socialNetwork Designation of social network
      * @param string $referLink Link to redirect afrer authorize
-     * @param string $role 
      *
      * @access private
-     *
-     * @todo adding gender and birthday
-     * @todo updating  existing users fields by new values  
      */     
-    private function addUser($userInfo, $socialNetwork, $referLink, $role = 'user') {
+    private function addUser($userInfo, $socialNetwork, $referLink) {
         
         $socialNetworkField = $socialNetwork . '_key';  
 
@@ -211,7 +208,8 @@ class UsersController extends AppController {
             ),
             'recursive' => -1
         );
-        $savedUser = $this->User->find('first',  $options);                
+        $savedUser = $this->User->find('first',  $options);  
+        
         if (!empty($savedUser)) {
             
             $this->User->id = $savedUser['User']['id'];
@@ -225,8 +223,9 @@ class UsersController extends AppController {
             }
         }
         
-        //fields that filled only when creating new user
-        $userActualFields['User']['role'] = $role;
+        //if your need fields that filled only when creating new user (role for example)
+        //set it here as $userActualFields['User']['role'] = 'admin';
+        
         
         $this->User->create();
         
