@@ -4,7 +4,7 @@
 
 It is very simple controller from users. 
 
-If you need to support other social network, you can use method 'addUser'. Call it in your specific method when OAuth return user data.
+If you need to added other social network, you can use method 'addUser'. Call it in your specific method when OAuth provider return user data.
 
 ### How do I get set up? ###
 
